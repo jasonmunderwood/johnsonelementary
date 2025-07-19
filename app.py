@@ -55,14 +55,17 @@ if st.button("Get Guidance"):
         )
 
         try:
-            response = openai.ChatCompletion.create(
-                model="gpt-4",
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_input}
-                ]
-            )
-            reply = response["choices"][0]["message"]["content"]
+           client = openai.OpenAI()  # create a client
+
+response = client.chat.completions.create(
+    model="gpt-4",
+    messages=[
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_input}
+    ]
+)
+reply = response.choices[0].message.content
+
             st.markdown(f"**Coach:** {reply}")
         except Exception as e:
             st.error(f"Error: {e}")
