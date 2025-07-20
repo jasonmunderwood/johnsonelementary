@@ -24,6 +24,14 @@ st.write(
     "Ask me anything!"
 )
 
+# ✅ Load Ken's system prompt from prompt.txt
+if os.path.exists("prompt.txt"):
+    with open("prompt.txt", "r") as f:
+        system_prompt = f.read()
+else:
+    st.error("❌ Missing 'prompt.txt'. Please add the file with Ken's system prompt.")
+    st.stop()
+
 # ✅ Ask for user name/email ONCE per session
 if "user_id" not in st.session_state:
     user_id_input = st.text_input(
@@ -50,10 +58,7 @@ if "messages" not in st.session_state or not st.session_state.messages:
             st.session_state.messages = json.load(f)
     else:
         st.session_state.messages = [
-            {"role": "system", "content": (
-                "You are a long-time employee of a school with knowledge of issues surrounding the current and desired state of technology at the school. "
-                "You have offered to help students design solutions for these problems in a technology refresh for Johnson Elementary..."
-            )}
+            {"role": "system", "content": system_prompt}
         ]
 
 # 📝 Display chat history
@@ -68,8 +73,13 @@ for msg in st.session_state.messages[1:]:  # Skip system prompt
 
 # 📋 Copy Conversation Button
 if st.button("📋 Copy Conversation"):
-    st.code(chat_transcript, language="text")  # Show in code block
-    st.success("✅ Conversation copied to clipboard (select and copy manually).")
+    st.text_area("📋 Conversation Transcript:", chat_transcript, height=300)
+    st.markdown("""
+        <script>
+        navigator.clipboard.writeText(`""" + chat_transcript.replace('`', '\`') + """`);
+        </script>
+    """, unsafe_allow_html=True)
+    st.success("✅ Conversation copied to clipboard!")
 
 # 💬 Input box for user message
 user_input = st.chat_input("Ask Ken something...")
@@ -104,7 +114,9 @@ if user_input:
 
 # 🔄 Reset conversation
 if st.button("🔄 Reset Conversation"):
-    st.session_state.messages = st.session_state.messages[:1]  # Keep system prompt
+    st.session_state.messages = [
+        {"role": "system", "content": system_prompt}
+    ]
     # Save reset state
     with open(history_file, "w") as f:
         json.dump(st.session_state.messages, f)
