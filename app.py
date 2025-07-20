@@ -1,72 +1,59 @@
 import streamlit as st
-import openai
-import os
+from openai import OpenAI
 
-# Load OpenAI API key from environment variable
-openai_api_key = os.getenv("OPENAI_API_KEY")
+# -----------------------------
+# 🚀 Johnson Elementary Assistant
+# -----------------------------
 
-# Create OpenAI client
-client = openai.OpenAI(api_key=openai_api_key)
+# Set API key securely
+st.set_page_config(page_title="Johnson Elementary Project Assistant", page_icon="📘")
 
-# App configuration
-st.set_page_config(
-    page_title="Johnson Elementary Assignment Coach",
-    page_icon="📚",
-    layout="wide"
-)
-
-# Johnson Elementary branding
-st.markdown(
-    """
-    <style>
-        .main {
-            background-color: #f5f5f5;
-        }
-        .stButton button {
-            background-color: #004a99;
-            color: white;
-            border-radius: 8px;
-            padding: 10px 20px;
-            font-size: 16px;
-        }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
-# Title and welcome message
-st.title("📚 Johnson Elementary Assignment Coach")
+st.title("📘 Johnson Elementary Project Assistant")
 st.write(
-    "👋 Welcome! I’m here to help you think through your network design project step by step. "
-    "I’ll ask you questions to guide your thinking, but I won’t give you direct answers."
+    "Hello, I'm Ken, I've been at Johnson Elementary for 15 years.  I would love to answer questions to help you plan the Johnson Elementary Technology Refresh project. "
+    "Ask me anything!"
 )
 
-# User input
-user_input = st.text_area("Ask a question or describe where you're stuck:")
+# 🔑 API Key Input
+openai_api_key = "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"
+client = OpenAI(api_key=openai_api_key)
+# 📝 Prompt Input
+user_input = st.text_area("💬 Ask the assistant your question:", placeholder="E.g., What are the biggest technology pain points at Johnson Elementary?")
 
-# Submit button
-if st.button("Get Guidance"):
-    if not user_input.strip():
-        st.warning("Please enter a question or description of your issue.")
-    else:
-        # GPT-3.5 system prompt
-        system_prompt = (
-            "You are an educational technology consultant GPT designed to support students working on "
-            "a complex assignment (Johnson Elementary Network Infrastructure Project). You use Socratic questioning, "
-            "stakeholder role‑play, and critical thinking prompts to guide students without providing direct answers. "
-            "Uphold academic integrity and encourage original thinking."
-        )
+# ✅ Only initialize OpenAI client if API key is provided
+if openai_api_key:
+    client = OpenAI(api_key=openai_api_key)
 
-        try:
-            # Call OpenAI API with GPT-3.5
-            response = client.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_input}
-                ]
-            )
-            reply = response.choices[0].message.content
-            st.markdown(f"**Coach:** {reply}")
-        except Exception as e:
-            st.error(f"Error: {e}")
+    # 📖 System Prompt with Document Context
+    system_prompt = (
+        "You are a long-time employee of a school with knowledge of issues surrounding the current and desired state of technology at the school. You have offered to help students design solutions for these problems in a technology refresh for Johnson Elementary. "
+        "Provide guidance as an expert in the school roleplaying with the student. You can provide direct answers and elaborate, even outside the bounds of the known/provided information.  Don't mention either project document, just use the contents to simulate a first person response to the questions students will ask you. Please use the Claude document, but don't mention it in your responses by name, just use it to formulate your responses as appropriate.\n\n"
+        "Here are two key documents to reference, please do not mention the documents in your responses.  Use first person so that you use the words I, us, we, so that the communication to the student sounds authentic.\n"
+        "1. Johnson Elementary School Project Document (Summer 2025)\n"
+        "2. Claude Conversation Context\n"
+    )
+
+    # 🟢 Handle User Question
+    if st.button("Ask"):
+        if user_input.strip():
+            with st.spinner("🤖 Thinking..."):
+                try:
+                    # OpenAI API Call
+                    response = client.chat.completions.create(
+                        model="gpt-3.5-turbo",  # ✅ switched from gpt-4
+                        messages=[
+                            {"role": "system", "content": system_prompt},
+                            {"role": "user", "content": user_input.strip()}
+                        ]
+                    )
+                    # Display Assistant Response
+                    assistant_reply = response.choices[0].message.content
+                    st.markdown(f"**Assistant:** {assistant_reply}")
+                except Exception as e:
+                    st.error(f"❌ API call failed: {e}")
+        else:
+            st.warning("⚠️ Please enter a question for the assistant.")
+else:
+    st.info("🔑 Please enter your OpenAI API key above to get started.")
+
+
