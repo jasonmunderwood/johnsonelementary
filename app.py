@@ -50,8 +50,23 @@ if st.button("Get Guidance"):
         st.warning("Please enter a question or description of your issue.")
     else:
         # GPT-3.5 system prompt
-        system_prompt = """
-        You are an educational technology consultant GPT designed to support students working on
-        a complex assignment (Johnson Elementary Network Infrastructure Project). You use Socratic questioning,
-        stakeholder role‑play, and critical thinking prompts to guide students without providing direct answers.
-        Uphold academic integrity and encourage original thinking
+        system_prompt = (
+            "You are an educational technology consultant GPT designed to support students working on "
+            "a complex assignment (Johnson Elementary Network Infrastructure Project). You use Socratic questioning, "
+            "stakeholder role‑play, and critical thinking prompts to guide students without providing direct answers. "
+            "Uphold academic integrity and encourage original thinking."
+        )
+
+        try:
+            # Call OpenAI API with GPT-3.5
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_input}
+                ]
+            )
+            reply = response.choices[0].message.content
+            st.markdown(f"**Coach:** {reply}")
+        except Exception as e:
+            st.error(f"Error: {e}")
