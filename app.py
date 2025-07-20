@@ -1,9 +1,14 @@
 import streamlit as st
 from openai import OpenAI
 
-# ✅ Read API key from Streamlit Secrets
+# 🛠 Use Project API key + Project ID
 openai_api_key = st.secrets["OPENAI_API_KEY"]
-client = OpenAI(api_key=openai_api_key)
+openai_project = st.secrets["OPENAI_PROJECT"]  # Add your project ID to secrets
+
+client = OpenAI(
+    api_key=openai_api_key,
+    organization=openai_project
+)
 
 # -----------------------------
 # 🚀 Johnson Elementary Assistant
