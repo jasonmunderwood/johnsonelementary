@@ -24,10 +24,19 @@ st.write(
     "Ask me anything!"
 )
 
-# 🔑 Ask for user name/email to identify them
-user_id = st.text_input("👤 Enter your name or email to start:", placeholder="e.g., alice@niu.edu")
+# ✅ Ask for user name/email ONCE per session
+if "user_id" not in st.session_state:
+    user_id_input = st.text_input(
+        "👤 Enter your name or email to start:",
+        placeholder="e.g., alice@niu.edu"
+    )
+    if user_id_input:
+        st.session_state.user_id = user_id_input
+        st.rerun()  # Refresh after setting user ID
 
-if user_id:
+if "user_id" in st.session_state:
+    user_id = st.session_state.user_id
+
     # Sanitize user_id for safe file names
     safe_user_id = user_id.replace("@", "_at_").replace(".", "_dot_").replace(" ", "_")
     history_file = f"history_{safe_user_id}.json"
@@ -58,14 +67,19 @@ if user_id:
             st.markdown(f"**Ken:** {msg['content']}")
 
     # 💬 Input box for user message
-    user_input = st.text_input("💬 Ask Ken a question:", placeholder="What are the biggest technology pain points at Johnson Elementary?", key="input")
+    user_input = st.text_input(
+        "💬 Ask Ken a question:",
+        placeholder="What are the biggest technology pain points at Johnson Elementary?",
+        key="input"
+    )
 
-if st.button("🔄 Reset Conversation"):
-    st.session_state.messages = st.session_state.messages[:1]  # Keep system prompt
-    # Save reset state
-    with open(history_file, "w") as f:
-        json.dump(st.session_state.messages, f)
-    st.rerun()  # ✅ Updated for Streamlit >=1.18
+    # 🔄 Reset conversation
+    if st.button("🔄 Reset Conversation"):
+        st.session_state.messages = st.session_state.messages[:1]  # Keep system prompt
+        # Save reset state
+        with open(history_file, "w") as f:
+            json.dump(st.session_state.messages, f)
+        st.rerun()
 
     # ✅ Process user input
     if user_input:
@@ -87,7 +101,7 @@ if st.button("🔄 Reset Conversation"):
                 with open(history_file, "w") as f:
                     json.dump(st.session_state.messages, f)
 
-                st.experimental_rerun()
+                st.rerun()
             except Exception as e:
                 st.error(f"❌ API call failed: {e}")
 else:
