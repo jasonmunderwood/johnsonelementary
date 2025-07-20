@@ -57,47 +57,16 @@ if "messages" not in st.session_state or not st.session_state.messages:
         ]
 
 # 📝 Display chat history
+chat_transcript = ""  # To store full conversation text
 for msg in st.session_state.messages[1:]:  # Skip system prompt
     if msg["role"] == "user":
         st.markdown(f"**You:** {msg['content']}")
+        chat_transcript += f"You: {msg['content']}\n"
     elif msg["role"] == "assistant":
         st.markdown(f"**Ken:** {msg['content']}")
+        chat_transcript += f"Ken: {msg['content']}\n"
 
-# 💬 Input box for user message
-user_input = st.chat_input("Ask Ken something...")
-
-if user_input:
-    # Append user message
-    st.session_state.messages.append({"role": "user", "content": user_input})
-
-    # Display user message immediately
-    st.markdown(f"**You:** {user_input}")
-
-    with st.spinner("🤖 Ken is thinking..."):
-        try:
-            response = client.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=st.session_state.messages
-            )
-            assistant_reply = response.choices[0].message.content
-
-            # Append assistant reply
-            st.session_state.messages.append({"role": "assistant", "content": assistant_reply})
-
-            # Display assistant reply
-            st.markdown(f"**Ken:** {assistant_reply}")
-
-            # Save updated history
-            with open(history_file, "w") as f:
-                json.dump(st.session_state.messages, f)
-
-        except Exception as e:
-            st.error(f"❌ API call failed: {e}")
-
-# 🔄 Reset conversation
-if st.button("🔄 Reset Conversation"):
-    st.session_state.messages = st.session_state.messages[:1]  # Keep system prompt
-    # Save reset state
-    with open(history_file, "w") as f:
-        json.dump(st.session_state.messages, f)
-    st.rerun()
+# 📋 Copy Conversation Button
+if st.button("📋 Copy Conversation"):
+    st.code(chat_transcript, language="text")  # Show in code block
+    st.success("✅ Conversation copied to clipboar
