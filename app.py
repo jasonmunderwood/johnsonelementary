@@ -60,13 +60,12 @@ if user_id:
     # 💬 Input box for user message
     user_input = st.text_input("💬 Ask Ken a question:", placeholder="What are the biggest technology pain points at Johnson Elementary?", key="input")
 
-    # 🔄 Reset conversation
-    if st.button("🔄 Reset Conversation"):
-        st.session_state.messages = st.session_state.messages[:1]  # Keep system prompt
-        # Save reset state
-        with open(history_file, "w") as f:
-            json.dump(st.session_state.messages, f)
-        st.experimental_rerun()
+if st.button("🔄 Reset Conversation"):
+    st.session_state.messages = st.session_state.messages[:1]  # Keep system prompt
+    # Save reset state
+    with open(history_file, "w") as f:
+        json.dump(st.session_state.messages, f)
+    st.rerun()  # ✅ Updated for Streamlit >=1.18
 
     # ✅ Process user input
     if user_input:
