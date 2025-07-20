@@ -71,16 +71,6 @@ for msg in st.session_state.messages[1:]:  # Skip system prompt
         st.markdown(f"**Ken:** {msg['content']}")
         chat_transcript += f"Ken: {msg['content']}\n"
 
-# 📋 Copy Conversation Button
-if st.button("📋 Copy Conversation"):
-    st.text_area("📋 Conversation Transcript:", chat_transcript, height=300)
-    st.markdown("""
-        <script>
-        navigator.clipboard.writeText(`""" + chat_transcript.replace('`', '\`') + """`);
-        </script>
-    """, unsafe_allow_html=True)
-    st.success("✅ Conversation copied to clipboard!")
-
 # 💬 Input box for user message
 user_input = st.chat_input("Ask Ken something...")
 
@@ -112,12 +102,25 @@ if user_input:
         except Exception as e:
             st.error(f"❌ API call failed: {e}")
 
-# 🔄 Reset conversation
-if st.button("🔄 Reset Conversation"):
-    st.session_state.messages = [
-        {"role": "system", "content": system_prompt}
-    ]
-    # Save reset state
-    with open(history_file, "w") as f:
-        json.dump(st.session_state.messages, f)
-    st.rerun()
+# 🔄 Reset + 📋 Copy Conversation Buttons Side by Side
+col1, col2 = st.columns(2)
+
+with col1:
+    if st.button("🔄 Reset Conversation"):
+        st.session_state.messages = [
+            {"role": "system", "content": system_prompt}
+        ]
+        # Save reset state
+        with open(history_file, "w") as f:
+            json.dump(st.session_state.messages, f)
+        st.rerun()
+
+with col2:
+    if st.button("📋 Copy Conversation"):
+        st.text_area("📋 Conversation Transcript:", chat_transcript, height=300)
+        st.markdown("""
+            <script>
+            navigator.clipboard.writeText(`""" + chat_transcript.replace('`', '\`') + """`);
+            </script>
+        """, unsafe_allow_html=True)
+        st.success("✅ Conversation copied to clipboard!")
