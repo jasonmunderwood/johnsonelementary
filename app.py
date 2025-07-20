@@ -9,7 +9,7 @@ openai_project = st.secrets["OPENAI_PROJECT"]
 
 client = OpenAI(
     api_key=openai_api_key,
-    organization=openai_project
+    project=openai_project
 )
 
 # -----------------------------
