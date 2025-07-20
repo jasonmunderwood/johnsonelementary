@@ -67,11 +67,21 @@ if "user_id" in st.session_state:
             st.markdown(f"**Ken:** {msg['content']}")
 
     # 💬 Input box for user message
-    user_input = st.text_input(
-        "💬 Ask Ken a question:",
-        placeholder="What are the biggest technology pain points at Johnson Elementary?",
-        key="input"
-    )
+user_input = st.text_input(
+    "💬 Ask Ken a question:",
+    placeholder="What are the biggest technology pain points at Johnson Elementary?",
+    key="input"
+)
+
+if user_input:
+    # Append user message
+    st.session_state.messages.append({"role": "user", "content": user_input})
+
+    # Clear the input box
+    st.session_state.input = ""
+
+    ...
+
 
     # 🔄 Reset conversation
     if st.button("🔄 Reset Conversation"):
