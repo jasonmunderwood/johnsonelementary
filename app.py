@@ -1,6 +1,10 @@
 import streamlit as st
 from openai import OpenAI
 
+# ✅ Read API key from Streamlit Secrets
+openai_api_key = st.secrets["OPENAI_API_KEY"]
+client = OpenAI(api_key=openai_api_key)
+
 # -----------------------------
 # 🚀 Johnson Elementary Assistant
 # -----------------------------
@@ -14,9 +18,7 @@ st.write(
     "Ask me anything!"
 )
 
-# 🔑 API Key Input
-openai_api_key = "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"
-client = OpenAI(api_key=openai_api_key)
+
 # 📝 Prompt Input
 user_input = st.text_area("💬 Ask the assistant your question:", placeholder="E.g., What are the biggest technology pain points at Johnson Elementary?")
 
